@@ -148,6 +148,8 @@
         "devDependencies": [
           "**/test/**",
           "**/build-tools/**",
+          "src/api-processing.lambda.ts",
+          "src/populate-table.lambda.ts",
           ".projenrc.ts",
           "projenrc/**/*.ts"
         ],

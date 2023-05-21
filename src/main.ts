@@ -1,13 +1,15 @@
+// import * as path from 'path';
 import { App, Stack, StackProps } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
 import * as appsync from 'aws-cdk-lib/aws-appsync';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as cr from 'aws-cdk-lib/custom-resources';
 import * as iam from 'aws-cdk-lib/aws-iam';
-
-import * as path from 'path';
+// import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as cr from 'aws-cdk-lib/custom-resources';
+import { Construct } from 'constructs';
+// Import the generated lambdas
+import { ApiProcessingFunction } from './api-processing-function';
+import { PopulateTableFunction } from './populate-table-function';
 
 
 export class MyStack extends Stack {
@@ -39,11 +41,12 @@ export class MyStack extends Stack {
     productTable.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
 
     // Create a new Lambda function to populate the table
-    const populateTableFunction = new lambda.Function(this, 'PopulateTableFunction', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/populateTable')),
-    });
+    const populateTableFunction = new PopulateTableFunction(this, 'PopulateTableFunction');
+    // const populateTableFunction = new lambda.Function(this, 'PopulateTableFunction', {
+    //   runtime: lambda.Runtime.NODEJS_14_X,
+    //   handler: 'index.handler',
+    //   code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/populateTable')),
+    // });
 
     // Grant read and write access to your DynamoDB table for the Lambda function
     customerTable.grantReadWriteData(populateTableFunction);
@@ -101,13 +104,14 @@ export class MyStack extends Stack {
 
 
     // Create the Lambda function
-    const customerLambda = new lambda.Function(this, 'AppSyncHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'main.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/api-processing')),
-      memorySize: 1024,
-    });
+    // const customerLambda = new lambda.Function(this, 'AppSyncHandler', {
+    //   runtime: lambda.Runtime.NODEJS_14_X,
+    //   handler: 'main.handler',
+    //   code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/api-processing')),
+    //   memorySize: 1024,
+    // });
 
+    const customerLambda = new ApiProcessingFunction(this, 'AppSyncHandler');
     // Set the data source for the API
     const customerDataSource = api.addLambdaDataSource('CustomerTableDataSource', customerLambda);
 
@@ -142,6 +146,8 @@ export class MyStack extends Stack {
   }
 }
 
+console.log('-->' + process.env.CDK_DEFAULT_REGION);
+console.log('-->' + process.env.CDK_DEFAULT_ACCOUNT);
 // for development, use account/region from cdk cli
 const devEnv = {
   account: process.env.CDK_DEFAULT_ACCOUNT,

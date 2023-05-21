@@ -17,6 +17,8 @@
     ".projen/tasks.json",
     "cdk.json",
     "LICENSE",
+    "src/api-processing-function.ts",
+    "src/populate-table-function.ts",
     "tsconfig.dev.json",
     "tsconfig.json"
   ],

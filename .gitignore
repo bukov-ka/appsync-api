@@ -54,4 +54,6 @@ junit.xml
 /cdk.out/
 .cdk.staging/
 .parcel-cache/
+!/src/api-processing-function.ts
+!/src/populate-table-function.ts
 !/.nvmrc

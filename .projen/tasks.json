@@ -43,7 +43,51 @@
     },
     "bundle": {
       "name": "bundle",
-      "description": "Prepare assets"
+      "description": "Prepare assets",
+      "steps": [
+        {
+          "spawn": "bundle:api-processing.lambda"
+        },
+        {
+          "spawn": "bundle:populate-table.lambda"
+        }
+      ]
+    },
+    "bundle:api-processing.lambda": {
+      "name": "bundle:api-processing.lambda",
+      "description": "Create a JavaScript bundle from src/api-processing.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/api-processing.lambda.ts --target=\"node16\" --platform=\"node\" --outfile=\"assets/api-processing.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:aws-sdk"
+        }
+      ]
+    },
+    "bundle:api-processing.lambda:watch": {
+      "name": "bundle:api-processing.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/api-processing.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/api-processing.lambda.ts --target=\"node16\" --platform=\"node\" --outfile=\"assets/api-processing.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:aws-sdk --watch"
+        }
+      ]
+    },
+    "bundle:populate-table.lambda": {
+      "name": "bundle:populate-table.lambda",
+      "description": "Create a JavaScript bundle from src/populate-table.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/populate-table.lambda.ts --target=\"node16\" --platform=\"node\" --outfile=\"assets/populate-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:aws-sdk"
+        }
+      ]
+    },
+    "bundle:populate-table.lambda:watch": {
+      "name": "bundle:populate-table.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/populate-table.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/populate-table.lambda.ts --target=\"node16\" --platform=\"node\" --outfile=\"assets/populate-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:aws-sdk --watch"
+        }
+      ]
     },
     "clobber": {
       "name": "clobber",
