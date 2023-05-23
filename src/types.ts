@@ -1,19 +1,23 @@
 export interface Order {
   id: string;
-  email: string;
   date: string;
-  customer: Customer | null;
+  totalAmount: number;
+  email: string;
+  customer: Customer;
+  product: string;
   products: Product[];
 }
 
+
 export interface Customer {
   email: string;
-  name: string;
+  fullName: string;
 }
 
 export interface Product {
-  id: string;
   name: string;
+  price: number;
+  quantity: number;
 }
 
 export interface LambdaEvent {
