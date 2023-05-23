@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import { LambdaEvent, Order, Customer, Product, ProductWithQuantity } from './types';
+import { LambdaEvent, Order, Customer, Product } from './types';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const CUSTOMER_TABLE = process.env.CUSTOMER_TABLE!;
@@ -16,12 +16,11 @@ exports.handler = async (event: LambdaEvent) => {
   }
 };
 
-// Other parts of the code remain the same
-
 async function getOrders(email: string, orderDate: string): Promise<Order[]> {
   console.log('getOrders: Fetching orders for customer with email', email, 'and order date', orderDate);
   const params = {
     TableName: ORDER_TABLE,
+    IndexName: 'emailDateIndex',
     KeyConditionExpression: 'email = :e AND #orderDate = :d',
     ExpressionAttributeValues: {
       ':e': email,
@@ -37,7 +36,7 @@ async function getOrders(email: string, orderDate: string): Promise<Order[]> {
     console.log('getOrders: Fetched orders', result);
 
     // Convert raw orders to Order type
-    const ordersWithProductIds = result.Items.map(item => ({
+    const ordersWithProductIds = result.Items.map((item: { id: string; date: string; email: string; product: string; quantity: number }) => ({
       id: item.id,
       date: item.date,
       totalAmount: 0, // Will be calculated later
@@ -46,15 +45,18 @@ async function getOrders(email: string, orderDate: string): Promise<Order[]> {
       products: [{ name: item.product, quantity: item.quantity }],
     })) as Order[];
 
+    // Group orders by id (your logic added here)
+    const groupedOrders = groupOrdersById(ordersWithProductIds);
+
     // Get all unique product names from the orders.
-    const allUniqueProductNames = new Set(ordersWithProductIds.flatMap(order => order.products.map(product => product.name)));
+    const allUniqueProductNames = new Set(groupedOrders.flatMap(order => order.products.map(product => product.name)));
 
     // Fetch all products by their names.
     const productsByName = await getProductsByNames(Array.from(allUniqueProductNames));
     console.log('getOrders: Fetched products by names', productsByName);
 
     // Construct the final list of orders with fetched products.
-    const ordersWithProducts = await Promise.all(ordersWithProductIds.map(async order => {
+    const ordersWithProducts = await Promise.all(groupedOrders.map(async order => {
       const customer = await getCustomerByEmail(order.email);
       const calculatedTotalAmount = order.products.reduce((total, product) => total + (productsByName[product.name].price * product.quantity), 0);
       return {
@@ -76,6 +78,24 @@ async function getOrders(email: string, orderDate: string): Promise<Order[]> {
     console.error(`getOrders: Error querying orders - ${error}`, params);
     throw error;
   }
+}
+
+function groupOrdersById(ordersWithProductIds: Order[]): Order[] {
+  const groupedOrders: { [key: string]: Order } = {};
+
+  ordersWithProductIds.forEach(order => {
+    if (!groupedOrders[order.id]) {
+      groupedOrders[order.id] = { ...order };
+    } else {
+      if (groupedOrders[order.id].date !== order.date || groupedOrders[order.id].email !== order.email) {
+        throw new Error(`Inconsistent date or email for order with id ${order.id}`);
+      }
+
+      groupedOrders[order.id].products.push(...order.products);
+    }
+  });
+
+  return Object.values(groupedOrders);
 }
 
 

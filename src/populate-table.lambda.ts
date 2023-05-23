@@ -26,6 +26,7 @@ export const handler = async () => {
     ];
     const orders = [
       {
+        lineId: '1',
         id: 'order1',
         date: '2022-01-01',
         email: 'johndoe@example.com', // use this field to associate customer with the order
@@ -33,13 +34,15 @@ export const handler = async () => {
         quantity: 3,
       },
       {
-        id: 'order3',
+        lineId: '2',
+        id: 'order1',
         date: '2022-01-01',
         email: 'johndoe@example.com', // use this field to associate customer with the order
         product: 'Product B', // use this field to associate product with the order
         quantity: 1,
       },
       {
+        lineId: '3',
         id: 'order2',
         date: '2022-01-02',
         email: 'janedoe@example.com', // use this field to associate customer with the order

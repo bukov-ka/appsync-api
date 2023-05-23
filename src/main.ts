@@ -72,6 +72,7 @@ export class MyStack extends Stack {
 
   // Create the DynamoDB table for Customers, Orders, Products
   private createDynamoDbTableStructure() {
+    // Create the DynamoDB table for Customers
     const customerTable = new dynamodb.Table(this, 'customerTable', {
       partitionKey: { name: 'email', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
@@ -79,9 +80,15 @@ export class MyStack extends Stack {
 
     // Create the DynamoDB table for Orders
     const orderTable = new dynamodb.Table(this, 'orderTable', {
+      partitionKey: { name: 'lineId', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    });
+
+    // Add GSI for querying by email and date
+    orderTable.addGlobalSecondaryIndex({
+      indexName: 'emailDateIndex',
       partitionKey: { name: 'email', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'date', type: dynamodb.AttributeType.STRING },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     });
 
     // Create the DynamoDB table for Products
