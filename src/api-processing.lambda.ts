@@ -1,22 +1,21 @@
-const AWS = require('aws-sdk');
-const { v4: uuidv4 } = require('uuid');
+import * as AWS from 'aws-sdk';
+import { LambdaEvent, Order, Customer, Product } from './types';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
-const CUSTOMER_TABLE = process.env.CUSTOMER_TABLE;
-const ORDER_TABLE = process.env.ORDER_TABLE;
-const PRODUCT_TABLE = process.env.PRODUCT_TABLE;
+const CUSTOMER_TABLE = process.env.CUSTOMER_TABLE!;
+const ORDER_TABLE = process.env.ORDER_TABLE!;
+const PRODUCT_TABLE = process.env.PRODUCT_TABLE!;
 
-exports.handler = async (event) => {
+exports.handler = async (event: LambdaEvent) => {
   switch (event.info.fieldName) {
     case 'orders':
-      console.log(`event: ${JSON.stringify(event)}`);
-      return await getOrders(event.arguments.email, event.arguments.orderDate);
+      return getOrders(event.arguments.email, event.arguments.orderDate);
     default:
       throw new Error(`Unknown field "${event.info.fieldName}"`);
   }
 };
 
-async function getOrders(email, orderDate) {
+async function getOrders(email: string, orderDate: string): Promise<Order[]> {
   const params = {
     TableName: ORDER_TABLE,
     KeyConditionExpression: 'email = :e AND #orderDate = :d',
@@ -29,12 +28,10 @@ async function getOrders(email, orderDate) {
     },
   };
 
-
   try {
     const result = await dynamoDb.query(params).promise();
 
-    // Fetch additional data for nested fields (such as customer and products)
-    const orders = await Promise.all(result.Items.map(async (order) => ({
+    const orders = await Promise.all(result.Items.map(async (order: Order) => ({
       ...order,
       customer: await getCustomerByEmail(order.email),
       products: await getProductsByOrderId(order.id),
@@ -42,14 +39,12 @@ async function getOrders(email, orderDate) {
 
     return orders;
   } catch (error) {
-    console.error('getOrders:' + error, params);
+    console.error(`getOrders: Error querying orders - ${error}`, params);
     throw error;
   }
 }
 
-
-// Function to fetch a customer by email
-async function getCustomerByEmail(email) {
+async function getCustomerByEmail(email: string): Promise<Customer | null> {
   const params = {
     TableName: CUSTOMER_TABLE,
     Key: {
@@ -59,25 +54,23 @@ async function getCustomerByEmail(email) {
 
   try {
     const result = await dynamoDb.get(params).promise();
-    return result.Item || null;
+    return result.Item as Customer | null;
   } catch (error) {
-    console.error('getCustomerByEmail:' + error, params);
+    console.error(`getCustomerByEmail: Error fetching customer by email - ${error}`, params);
     throw error;
   }
 }
 
-// Function to fetch products for each order
-async function getProductsByOrderId(orderId) {
-  // Placeholder: You need to adjust the following code according to your data model to link products with orders.
+async function getProductsByOrderId(orderId: string): Promise<Product[]> {
   const params = {
     TableName: PRODUCT_TABLE,
   };
 
   try {
     const result = await dynamoDb.scan(params).promise();
-    return result.Items || [];
+    return result.Items as Product[] || [];
   } catch (error) {
-    console.error('getProductsByOrderId:' + error, params);
+    console.error(`getProductsByOrderId: Error fetching products for order - ${error}`, params);
     throw error;
   }
 }

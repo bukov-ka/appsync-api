@@ -4,6 +4,7 @@ const dynamoDb = new DynamoDB.DocumentClient();
 
 export const handler = async () => {
   try {
+    // Get the table names from the environment variables
     const customerTableName = process.env.CUSTOMER_TABLE;
     const orderTableName = process.env.ORDER_TABLE;
     const productTableName = process.env.PRODUCT_TABLE;
@@ -11,7 +12,8 @@ export const handler = async () => {
       throw new Error('Missing environment variables pointing to tables.');
     }
 
-    // Define your initial test data here
+    // Initial test data here
+    // In a real world scenario, these would be populated from a database or other source
     const customers = [
       {
         email: 'johndoe@example.com',
@@ -29,7 +31,6 @@ export const handler = async () => {
         totalAmount: 100,
         email: 'johndoe@example.com', // use this field to associate customer with the order
         product: 'Product A', // use this field to associate product with the order
-
       },
       {
         id: 'order2',
@@ -52,27 +53,33 @@ export const handler = async () => {
       },
     ];
 
-    console.log(JSON.stringify(process.env));
+    // Put the items to the tables
+    // Put the items to the tables
+    const items = [customers, orders, products];
+    const tableNames = [customerTableName, orderTableName, productTableName];
 
-    console.log('--> Putting the itemto the customer table: ${customerTableName}, items: ${JSON.stringify(customers)}');
+    console.log('Putting the items to the tables:');
     await Promise.all(
-      customers.map((item) =>
-        dynamoDb.put({ TableName: customerTableName, Item: item }).promise(),
-      ),
-    );
+      tableNames.map((tableName, index) => {
+        const currentItemBatch = items[index].map(item => ({
+          PutRequest: {
+            Item: item,
+          },
+        }));
 
-    console.log('--> Putting the itemto the order table: ${orderTableName}, items: ${JSON.stringify(orders)}');
-    await Promise.all(
-      orders.map((item) =>
-        dynamoDb.put({ TableName: orderTableName, Item: item }).promise(),
-      ),
-    );
-
-    console.log('--> Putting the itemto the product table: ${productTableName}, items: ${JSON.stringify(products)}');
-    await Promise.all(
-      products.map((item) =>
-        dynamoDb.put({ TableName: productTableName, Item: item }).promise(),
-      ),
+        console.log(`Putting the items to the ${tableName} table:`, currentItemBatch);
+        // Batch write the items to the table
+        return dynamoDb.batchWrite({
+          RequestItems: {
+            [tableName]: currentItemBatch,
+          },
+        })
+          .promise()
+          .catch((error: any) => {
+            console.error(`Error putting items to table ${tableName}:`, error);
+            throw error;
+          });
+      }),
     );
 
     console.log('Test data populated successfully.');
