@@ -28,28 +28,33 @@ export const handler = async () => {
       {
         id: 'order1',
         date: '2022-01-01',
-        totalAmount: 100,
         email: 'johndoe@example.com', // use this field to associate customer with the order
         product: 'Product A', // use this field to associate product with the order
+        quantity: 3,
+      },
+      {
+        id: 'order3',
+        date: '2022-01-01',
+        email: 'johndoe@example.com', // use this field to associate customer with the order
+        product: 'Product B', // use this field to associate product with the order
+        quantity: 1,
       },
       {
         id: 'order2',
         date: '2022-01-02',
-        totalAmount: 200,
         email: 'janedoe@example.com', // use this field to associate customer with the order
         product: 'Product A', // use this field to associate product with the order
+        quantity: 5,
       },
     ];
     const products = [
       {
         name: 'Product A',
         price: 50,
-        quantity: 10,
       },
       {
         name: 'Product B',
         price: 25,
-        quantity: 20,
       },
     ];
 

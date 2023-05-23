@@ -4,10 +4,8 @@ export interface Order {
   totalAmount: number;
   email: string;
   customer: Customer;
-  product: string;
-  products: Product[];
+  products: ProductWithQuantity[];
 }
-
 
 export interface Customer {
   email: string;
@@ -17,6 +15,9 @@ export interface Customer {
 export interface Product {
   name: string;
   price: number;
+}
+
+export interface ProductWithQuantity extends Product {
   quantity: number;
 }
 
