@@ -2,6 +2,8 @@ import { DynamoDB } from 'aws-sdk';
 
 const dynamoDb = new DynamoDB.DocumentClient();
 
+// Mapping of table names to their primary key attribute names
+
 export const handler = async () => {
   try {
     // Get the table names from the environment variables
@@ -11,6 +13,11 @@ export const handler = async () => {
     if (!customerTableName || !orderTableName || !productTableName) {
       throw new Error('Missing environment variables pointing to tables.');
     }
+    const primaryKeyMapping = {
+      [customerTableName]: 'email',
+      [orderTableName]: 'lineId', // Assuming 'lineId' is the primary key for the order table
+      [productTableName]: 'name', // Assuming 'name' is the primary key for the product table
+    };
 
     // Initial test data here
     // In a real world scenario, these would be populated from a database or other source
@@ -62,9 +69,16 @@ export const handler = async () => {
     ];
 
     // Put the items to the tables
-    // Put the items to the tables
     const items = [customers, orders, products];
     const tableNames = [customerTableName, orderTableName, productTableName];
+
+    // Clear the tables before populating
+    console.log('Clearing the tables:', tableNames);
+    await Promise.all(
+      tableNames.map(async (tableName) => {
+        await clearTable(tableName, primaryKeyMapping);
+      }),
+    );
 
     console.log('Putting the items to the tables:');
     await Promise.all(
@@ -101,3 +115,34 @@ export const handler = async () => {
     throw error;
   }
 };
+
+// Helper function to clear table
+async function clearTable(tableName: string, primaryKeyMapping: { [x: string]: string; }) {
+  const primaryKeyAttributeName = primaryKeyMapping[tableName];
+
+  const params = {
+    TableName: tableName,
+    ProjectionExpression: '#id',
+    ExpressionAttributeNames: {
+      '#id': primaryKeyAttributeName,
+    },
+  };
+  // Get the items from the table and delete them
+  const items = await dynamoDb.scan(params).promise();
+  if (items.Items.length > 0) {
+    const deleteReqs = items.Items.map((item: any) => (
+      {
+        DeleteRequest: {
+          Key: item,
+        },
+      }
+    ));
+
+    return dynamoDb.batchWrite({
+      RequestItems: {
+        [tableName]: deleteReqs,
+      },
+    }).promise();
+  }
+}
+
