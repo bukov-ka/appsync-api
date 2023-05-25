@@ -16,10 +16,10 @@ export class MyStack extends Stack {
     super(scope, id, props);
 
     // Create the DynamoDB tables
-    const { customerTable, orderTable, productTable } = this.createDynamoDbTableStructure();
+    const { orderTable, productTable } = this.createDynamoDbTableStructure();
 
     // Create a custom resource to trigger the Lambda function on stack deployment
-    this.populateDataOnDeploy(customerTable, orderTable, productTable);
+    this.populateDataOnDeploy(orderTable, productTable);
 
     // Create the AppSync API
     const appSyncAPI = new appsync.GraphqlApi(this, 'Api', {
@@ -39,10 +39,8 @@ export class MyStack extends Stack {
     // Lambda to process requests
     const backendLambda = new ApiProcessingFunction(this, 'AppSyncHandler');
     // Grant read permissions on DynamoDB table to the Lambda function
-    customerTable.grantReadData(backendLambda);
     orderTable.grantReadData(backendLambda);
     productTable.grantReadData(backendLambda);
-    backendLambda.addEnvironment('CUSTOMER_TABLE', customerTable.tableName);
     backendLambda.addEnvironment('ORDER_TABLE', orderTable.tableName);
     backendLambda.addEnvironment('PRODUCT_TABLE', productTable.tableName);
 
@@ -72,12 +70,6 @@ export class MyStack extends Stack {
 
   // Create the DynamoDB table for Customers, Orders, Products
   private createDynamoDbTableStructure() {
-    // Create the DynamoDB table for Customers
-    const customerTable = new dynamodb.Table(this, 'customerTable', {
-      partitionKey: { name: 'email', type: dynamodb.AttributeType.STRING },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-    });
-
     // Create the DynamoDB table for Orders
     const orderTable = new dynamodb.Table(this, 'orderTable', {
       partitionKey: { name: 'lineId', type: dynamodb.AttributeType.STRING },
@@ -93,30 +85,27 @@ export class MyStack extends Stack {
 
     // Create the DynamoDB table for Products
     const productTable = new dynamodb.Table(this, 'productTable', {
-      partitionKey: { name: 'name', type: dynamodb.AttributeType.STRING },
+      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING }, // Change partitionKey from 'name' to 'id'
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     });
 
     // This is a demo app, so we'll clean up resources when the stack is deleted
     // For production we need to retain the data
-    customerTable.applyRemovalPolicy(awsCdk.RemovalPolicy.DESTROY);
     orderTable.applyRemovalPolicy(awsCdk.RemovalPolicy.DESTROY);
     productTable.applyRemovalPolicy(awsCdk.RemovalPolicy.DESTROY);
-    return { customerTable, orderTable, productTable };
+    return { orderTable, productTable };
   }
 
   // Create a custom resource to trigger the Lambda function on stack deployment
-  private populateDataOnDeploy(customerTable: dynamodb.Table, orderTable: dynamodb.Table, productTable: dynamodb.Table) {
+  private populateDataOnDeploy(orderTable: dynamodb.Table, productTable: dynamodb.Table) {
     // Create a new Lambda function to populate the table
     const populateTableFunction = new PopulateTableFunction(this, 'PopulateTableFunction');
 
     // Grant read and write access to your DynamoDB table for the Lambda function
-    customerTable.grantReadWriteData(populateTableFunction);
     orderTable.grantReadWriteData(populateTableFunction);
     productTable.grantReadWriteData(populateTableFunction);
 
     // Add the table name as an environment variable to the Lambda function
-    populateTableFunction.addEnvironment('CUSTOMER_TABLE', customerTable.tableName);
     populateTableFunction.addEnvironment('ORDER_TABLE', orderTable.tableName);
     populateTableFunction.addEnvironment('PRODUCT_TABLE', productTable.tableName);
     // Create a custom role to add policies to it
