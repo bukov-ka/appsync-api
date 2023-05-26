@@ -113,7 +113,7 @@ export const handler = async () => {
 };
 
 // Helper function to clear table
-async function clearTable(tableName: string, primaryKeyMapping: { [x: string]: string; }) {
+async function clearTable(tableName: string, primaryKeyMapping: { [x: string]: string }) {
   const primaryKeyAttributeName = primaryKeyMapping[tableName];
 
   const params = {

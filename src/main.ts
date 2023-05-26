@@ -11,7 +11,7 @@ import { PopulateTableFunction } from './populate-table-function';
 
 const API_KEY_EXPIRATION = awsCdk.Duration.days(365);
 
-export class MyStack extends Stack {
+export class OrdersAPIStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps = {}) {
     super(scope, id, props);
 
@@ -146,7 +146,7 @@ const devEnv = {
 
 const app = new App();
 
-new MyStack(app, 'appsync-api-dev', { env: devEnv });
+new OrdersAPIStack(app, 'appsync-api-dev', { env: devEnv });
 // new MyStack(app, 'appsync-api-prod', { env: prodEnv });
 
 app.synth();

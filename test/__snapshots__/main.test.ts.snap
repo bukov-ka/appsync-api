@@ -1,0 +1,817 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snapshot 1`] = `
+{
+  "Mappings": {
+    "DefaultCrNodeVersionMap": {
+      "af-south-1": {
+        "value": "nodejs16.x",
+      },
+      "ap-east-1": {
+        "value": "nodejs16.x",
+      },
+      "ap-northeast-1": {
+        "value": "nodejs16.x",
+      },
+      "ap-northeast-2": {
+        "value": "nodejs16.x",
+      },
+      "ap-northeast-3": {
+        "value": "nodejs16.x",
+      },
+      "ap-south-1": {
+        "value": "nodejs16.x",
+      },
+      "ap-south-2": {
+        "value": "nodejs16.x",
+      },
+      "ap-southeast-1": {
+        "value": "nodejs16.x",
+      },
+      "ap-southeast-2": {
+        "value": "nodejs16.x",
+      },
+      "ap-southeast-3": {
+        "value": "nodejs16.x",
+      },
+      "ca-central-1": {
+        "value": "nodejs16.x",
+      },
+      "cn-north-1": {
+        "value": "nodejs16.x",
+      },
+      "cn-northwest-1": {
+        "value": "nodejs16.x",
+      },
+      "eu-central-1": {
+        "value": "nodejs16.x",
+      },
+      "eu-central-2": {
+        "value": "nodejs16.x",
+      },
+      "eu-north-1": {
+        "value": "nodejs16.x",
+      },
+      "eu-south-1": {
+        "value": "nodejs16.x",
+      },
+      "eu-south-2": {
+        "value": "nodejs16.x",
+      },
+      "eu-west-1": {
+        "value": "nodejs16.x",
+      },
+      "eu-west-2": {
+        "value": "nodejs16.x",
+      },
+      "eu-west-3": {
+        "value": "nodejs16.x",
+      },
+      "me-central-1": {
+        "value": "nodejs16.x",
+      },
+      "me-south-1": {
+        "value": "nodejs16.x",
+      },
+      "sa-east-1": {
+        "value": "nodejs16.x",
+      },
+      "us-east-1": {
+        "value": "nodejs16.x",
+      },
+      "us-east-2": {
+        "value": "nodejs16.x",
+      },
+      "us-gov-east-1": {
+        "value": "nodejs16.x",
+      },
+      "us-gov-west-1": {
+        "value": "nodejs16.x",
+      },
+      "us-iso-east-1": {
+        "value": "nodejs14.x",
+      },
+      "us-iso-west-1": {
+        "value": "nodejs14.x",
+      },
+      "us-isob-east-1": {
+        "value": "nodejs14.x",
+      },
+      "us-west-1": {
+        "value": "nodejs16.x",
+      },
+      "us-west-2": {
+        "value": "nodejs16.x",
+      },
+    },
+  },
+  "Outputs": {
+    "GraphQLAPIKey": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ApiDefaultApiKeyF991C37B",
+          "ApiKey",
+        ],
+      },
+    },
+    "GraphQLAPIURL": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ApiF70053CD",
+          "GraphQLUrl",
+        ],
+      },
+    },
+  },
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "AWS679f53fac002430cb0da5b7982bd22872D164C4C": {
+      "DependsOn": [
+        "CustomResourceRoleDefaultPolicyFA36F832",
+        "CustomResourceRoleAB1EF463",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "bb459fac5f6b4b052aac9803443226d161a5cfe96f4648b21f9e4912c698bf30.zip",
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "CustomResourceRoleAB1EF463",
+            "Arn",
+          ],
+        },
+        "Runtime": {
+          "Fn::FindInMap": [
+            "DefaultCrNodeVersionMap",
+            {
+              "Ref": "AWS::Region",
+            },
+            "value",
+          ],
+        },
+        "Timeout": 120,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "ApiCustomerTableDataSource8154D467": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "ApiF70053CD",
+            "ApiId",
+          ],
+        },
+        "LambdaConfig": {
+          "LambdaFunctionArn": {
+            "Fn::GetAtt": [
+              "AppSyncHandlerC41B9ACB",
+              "Arn",
+            ],
+          },
+        },
+        "Name": "CustomerTableDataSource",
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "ApiCustomerTableDataSourceServiceRole3DFE90E6",
+            "Arn",
+          ],
+        },
+        "Type": "AWS_LAMBDA",
+      },
+      "Type": "AWS::AppSync::DataSource",
+    },
+    "ApiCustomerTableDataSourceServiceRole3DFE90E6": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "appsync.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "ApiCustomerTableDataSourceServiceRoleDefaultPolicy83A56B52": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "lambda:InvokeFunction",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "AppSyncHandlerC41B9ACB",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "AppSyncHandlerC41B9ACB",
+                          "Arn",
+                        ],
+                      },
+                      ":*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "ApiCustomerTableDataSourceServiceRoleDefaultPolicy83A56B52",
+        "Roles": [
+          {
+            "Ref": "ApiCustomerTableDataSourceServiceRole3DFE90E6",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "ApiDefaultApiKeyF991C37B": {
+      "DependsOn": [
+        "ApiSchema510EECD7",
+      ],
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "ApiF70053CD",
+            "ApiId",
+          ],
+        },
+        "Expires": 1716609197,
+      },
+      "Type": "AWS::AppSync::ApiKey",
+    },
+    "ApiF70053CD": {
+      "Properties": {
+        "AuthenticationType": "API_KEY",
+        "Name": "customerOrders",
+        "XrayEnabled": true,
+      },
+      "Type": "AWS::AppSync::GraphQLApi",
+    },
+    "ApiSchema510EECD7": {
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "ApiF70053CD",
+            "ApiId",
+          ],
+        },
+        "Definition": "type Customer {
+  email: String!
+  fullName: String!
+}
+
+type Order {
+  id: ID!
+  date: String!
+  totalAmount: Float!
+  customer: Customer!
+  products: [Product!]!
+}
+
+type Product {
+  name: String!
+  price: Float!
+  quantity: Int!
+}
+
+type Query {
+  orders(email: String!, orderDate: String!): [Order!]!
+}
+",
+      },
+      "Type": "AWS::AppSync::GraphQLSchema",
+    },
+    "ApicustomerQueryResolver00117096": {
+      "DependsOn": [
+        "ApiCustomerTableDataSource8154D467",
+        "ApiSchema510EECD7",
+      ],
+      "Properties": {
+        "ApiId": {
+          "Fn::GetAtt": [
+            "ApiF70053CD",
+            "ApiId",
+          ],
+        },
+        "DataSourceName": "CustomerTableDataSource",
+        "FieldName": "orders",
+        "Kind": "UNIT",
+        "RequestMappingTemplate": "{"version": "2017-02-28", "operation": "Invoke", "payload": $util.toJson($ctx)}",
+        "ResponseMappingTemplate": "$util.toJson($ctx.result)",
+        "TypeName": "Query",
+      },
+      "Type": "AWS::AppSync::Resolver",
+    },
+    "AppSyncHandlerC41B9ACB": {
+      "DependsOn": [
+        "AppSyncHandlerServiceRoleDefaultPolicy78985631",
+        "AppSyncHandlerServiceRole9FC2FD31",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "e4d27837937937e3e7102f65da3e750a35b9ef1d3de463986fc6ef92a007c535.zip",
+        },
+        "Description": "src/api-processing.lambda.ts",
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+            "ORDER_TABLE": {
+              "Ref": "orderTable2AB11F49",
+            },
+            "PRODUCT_TABLE": {
+              "Ref": "productTable02AC15CB",
+            },
+          },
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "AppSyncHandlerServiceRole9FC2FD31",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs16.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "AppSyncHandlerServiceRole9FC2FD31": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "AppSyncHandlerServiceRoleDefaultPolicy78985631": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:DescribeTable",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "orderTable2AB11F49",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "orderTable2AB11F49",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:DescribeTable",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "productTable02AC15CB",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Ref": "AWS::NoValue",
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "AppSyncHandlerServiceRoleDefaultPolicy78985631",
+        "Roles": [
+          {
+            "Ref": "AppSyncHandlerServiceRole9FC2FD31",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "CustomResourceRoleAB1EF463": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "CustomResourceRoleDefaultPolicyFA36F832": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": "arn:aws:logs:*:*:*",
+            },
+            {
+              "Action": "lambda:InvokeFunction",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "PopulateTableFunctionF6347F15",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "CustomResourceRoleDefaultPolicyFA36F832",
+        "Roles": [
+          {
+            "Ref": "CustomResourceRoleAB1EF463",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "PopulateTableCustomResourceCustomResourcePolicy9B9419F6": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "lambda:Invoke",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "PopulateTableCustomResourceCustomResourcePolicy9B9419F6",
+        "Roles": [
+          {
+            "Ref": "CustomResourceRoleAB1EF463",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "PopulateTableCustomResourceF403D384": {
+      "DeletionPolicy": "Delete",
+      "DependsOn": [
+        "PopulateTableCustomResourceCustomResourcePolicy9B9419F6",
+      ],
+      "Properties": {
+        "Create": {
+          "Fn::Join": [
+            "",
+            [
+              "{"service":"Lambda","action":"invoke","physicalResourceId":{"id":"PopulateTableCustomResourceId"},"parameters":{"FunctionName":"",
+              {
+                "Ref": "PopulateTableFunctionF6347F15",
+              },
+              ""}}",
+            ],
+          ],
+        },
+        "InstallLatestAwsSdk": true,
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "AWS679f53fac002430cb0da5b7982bd22872D164C4C",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::AWS",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "PopulateTableFunctionF6347F15": {
+      "DependsOn": [
+        "PopulateTableFunctionServiceRoleDefaultPolicy7C543758",
+        "PopulateTableFunctionServiceRoleB44223E7",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "396ea4edf2db369eddf8baa9dac6b43b4f643e01461271624caf78468613144a.zip",
+        },
+        "Description": "src/populate-table.lambda.ts",
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+            "ORDER_TABLE": {
+              "Ref": "orderTable2AB11F49",
+            },
+            "PRODUCT_TABLE": {
+              "Ref": "productTable02AC15CB",
+            },
+          },
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "PopulateTableFunctionServiceRoleB44223E7",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs16.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "PopulateTableFunctionServiceRoleB44223E7": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "PopulateTableFunctionServiceRoleDefaultPolicy7C543758": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "orderTable2AB11F49",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "orderTable2AB11F49",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "productTable02AC15CB",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Ref": "AWS::NoValue",
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "PopulateTableFunctionServiceRoleDefaultPolicy7C543758",
+        "Roles": [
+          {
+            "Ref": "PopulateTableFunctionServiceRoleB44223E7",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "orderTable2AB11F49": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "lineId",
+            "AttributeType": "S",
+          },
+          {
+            "AttributeName": "email",
+            "AttributeType": "S",
+          },
+          {
+            "AttributeName": "date",
+            "AttributeType": "S",
+          },
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "GlobalSecondaryIndexes": [
+          {
+            "IndexName": "emailDateIndex",
+            "KeySchema": [
+              {
+                "AttributeName": "email",
+                "KeyType": "HASH",
+              },
+              {
+                "AttributeName": "date",
+                "KeyType": "RANGE",
+              },
+            ],
+            "Projection": {
+              "ProjectionType": "ALL",
+            },
+          },
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "lineId",
+            "KeyType": "HASH",
+          },
+        ],
+      },
+      "Type": "AWS::DynamoDB::Table",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "productTable02AC15CB": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S",
+          },
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH",
+          },
+        ],
+      },
+      "Type": "AWS::DynamoDB::Table",
+      "UpdateReplacePolicy": "Delete",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;

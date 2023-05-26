@@ -1,9 +1,9 @@
-import { DeployableAwsCdkTypeScriptApp } from "deployable-awscdk-app-ts";
+import { DeployableAwsCdkTypeScriptApp } from 'deployable-awscdk-app-ts';
 const project = new DeployableAwsCdkTypeScriptApp({
-  cdkVersion: "2.1.0",
-  defaultReleaseBranch: "main",
-  devDeps: ["deployable-awscdk-app-ts"],
-  name: "appsync-api",
+  cdkVersion: '2.1.0',
+  defaultReleaseBranch: 'main',
+  devDeps: ['deployable-awscdk-app-ts'],
+  name: 'appsync-api',
   projenrcTs: true,
 
   // deps: [],                /* Runtime dependencies of this module. */
