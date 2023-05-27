@@ -11,7 +11,7 @@ const CACHE_TTL = 60 * 1000; // 1 minute in milliseconds
 const CACHE_MAX_ITEMS = 500; // max number of products to store
 const productCache = new LRUCache(CACHE_MAX_ITEMS, CACHE_TTL);
 
-
+// Main Lambda function handler that routes the event to the appropriate resolver
 exports.handler = async (event: LambdaEvent) => {
   console.log('event', event);
   switch (event.info.fieldName) {
@@ -22,8 +22,12 @@ exports.handler = async (event: LambdaEvent) => {
   }
 };
 
+// Fetch orders from the DynamoDB table using the provided email and order date
 async function getOrders(email: string, orderDate: string): Promise<Order[]> {
+  // Log the input values for debugging purposes
   console.log('getOrders: Fetching orders for customer with email', email, 'and order date', orderDate);
+
+  // Build query parameters using the input values
   const params = {
     TableName: ORDER_TABLE,
     IndexName: 'emailDateIndex',
@@ -38,13 +42,12 @@ async function getOrders(email: string, orderDate: string): Promise<Order[]> {
   };
 
   try {
+    // Query the table with the specified parameters
     const result = await dynamoDb.query(params).promise();
+    // Log the fetched orders for debugging purposes
     console.log('getOrders: Fetched orders', result);
-
     const productIds = Array.from(new Set(result.Items!.map((item: any) => item.productId))) as string[];
-
     const productsById = await getProductsByIds(productIds);
-
     const ordersWithProductIds = result.Items!.map((item: any) => ({
       lineId: item.lineId,
       id: item.id,
@@ -63,15 +66,16 @@ async function getOrders(email: string, orderDate: string): Promise<Order[]> {
 
     return groupedOrders;
   } catch (error) {
+    // Log the error and re-throw it
     console.error(`getOrders: Error querying orders - ${error}`, params);
     throw error;
   }
 }
 
-function groupOrdersById(ordersWithProductIds: Order[]): Order[] {
+// Group orders by their id
+function groupOrdersById(orders: Order[]): Order[] {
   const groupedOrders: { [key: string]: Order } = {};
-
-  ordersWithProductIds.forEach(order => {
+  orders.forEach(order => {
     if (!groupedOrders[order.id]) {
       groupedOrders[order.id] = {
         ...order,
@@ -81,10 +85,11 @@ function groupOrdersById(ordersWithProductIds: Order[]): Order[] {
           quantity: order.quantity ?? 0,
         })),
       };
+      // Remove the root level object properties
       delete groupedOrders[order.id].product;
       delete groupedOrders[order.id].quantity;
       delete groupedOrders[order.id].productId;
-      delete groupedOrders[order.id].price; // Remove price from the root level object
+      delete groupedOrders[order.id].price;
     } else {
       groupedOrders[order.id].products?.push({
         name: order.product!.name,
@@ -103,15 +108,19 @@ function groupOrdersById(ordersWithProductIds: Order[]): Order[] {
   }));
 }
 
+// Fetch products from the DynamoDB table using the provided array of ids
 async function getProductsByIds(ids: string[]): Promise<Record<string, Product>> {
   try {
     console.log('getProductsByIds: Fetching products by ids', ids);
+
+    // Fetch each product in parallel using a series of promises
     const productsPromise = ids.map(async id => {
       // Try getting the product from the cache
       let product = productCache.get(id);
 
       // If the product is not in the cache, fetch it from the database
       if (!product) {
+        // Code to fetch the product from the database and store it in the cache
         const productParams = {
           TableName: PRODUCT_TABLE,
           Key: { id },
@@ -126,9 +135,8 @@ async function getProductsByIds(ids: string[]): Promise<Record<string, Product>>
       return product;
     });
 
+    // Await all the promises to resolve and build a map of fetched products
     const products = await Promise.all(productsPromise);
-
-    // Convert the array of products into a map with ids as keys
     const productsById: Record<string, Product> = {};
     products.forEach(product => {
       if (product) {
@@ -138,6 +146,7 @@ async function getProductsByIds(ids: string[]): Promise<Record<string, Product>>
 
     return productsById;
   } catch (error) {
+    // Log the error and re-throw it
     console.error(`getProductsByIds: Error fetching products by ids - ${error}`);
     throw error;
   }
