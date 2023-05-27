@@ -260,7 +260,7 @@ exports[`Snapshot 1`] = `
             "ApiId",
           ],
         },
-        "Expires": 1716609197,
+        "Expires": 1716694075,
       },
       "Type": "AWS::AppSync::ApiKey",
     },

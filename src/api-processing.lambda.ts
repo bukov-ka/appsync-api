@@ -1,9 +1,16 @@
 import * as AWS from 'aws-sdk';
+import { LRUCache } from './lru-cache';
 import { LambdaEvent, Order, Product } from './types';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const ORDER_TABLE = process.env.ORDER_TABLE!;
 const PRODUCT_TABLE = process.env.PRODUCT_TABLE!;
+
+// Configure the cache constants
+const CACHE_TTL = 60 * 1000; // 1 minute in milliseconds
+const CACHE_MAX_ITEMS = 500; // max number of products to store
+const productCache = new LRUCache(CACHE_MAX_ITEMS, CACHE_TTL);
+
 
 exports.handler = async (event: LambdaEvent) => {
   console.log('event', event);
@@ -98,12 +105,23 @@ async function getProductsByIds(ids: string[]): Promise<Record<string, Product>>
   try {
     console.log('getProductsByIds: Fetching products by ids', ids);
     const productsPromise = ids.map(async id => {
-      const productParams = {
-        TableName: PRODUCT_TABLE,
-        Key: { id },
-      };
-      const productResult = await dynamoDb.get(productParams).promise();
-      return productResult.Item as Product;
+      // Try getting the product from the cache
+      let product = productCache.get(id);
+
+      // If the product is not in the cache, fetch it from the database
+      if (!product) {
+        const productParams = {
+          TableName: PRODUCT_TABLE,
+          Key: { id },
+        };
+        const productResult = await dynamoDb.get(productParams).promise();
+        product = productResult.Item as Product;
+
+        // Store the fetched product in the cache
+        productCache.set(id, product);
+      }
+
+      return product;
     });
 
     const products = await Promise.all(productsPromise);
