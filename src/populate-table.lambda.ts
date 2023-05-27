@@ -29,6 +29,7 @@ export const handler = async () => {
         productId: 'productA', // use this field to associate product with the order
         totalAmount: 175.0,
         quantity: 3,
+        price: 50,
       },
       {
         lineId: '2',
@@ -39,6 +40,7 @@ export const handler = async () => {
         productId: 'productB', // use this field to associate product with the order
         totalAmount: 175.0,
         quantity: 1,
+        price: 25,
       },
       {
         lineId: '3',
@@ -49,18 +51,19 @@ export const handler = async () => {
         productId: 'productA', // use this field to associate product with the order
         quantity: 5,
         totalAmount: 125.0,
+        price: 25,
       },
     ];
     const products = [
       {
         id: 'productA',
         name: 'Product A',
-        price: 50,
+        price: 150,
       },
       {
         id: 'productB',
         name: 'Product B',
-        price: 25,
+        price: 125,
       },
     ];
 

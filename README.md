@@ -25,6 +25,7 @@ Here's the denormalized database schema for the provided data in README.md forma
 | productId    | String    | FOREIGN KEY (Products.id)      | References associated product        |
 | totalAmount  | Float     | NOT NULL                       | Total amount for the order           |
 | quantity     | Integer   | NOT NULL, CHECK (quantity > 0) | Quantity of product ordered          |
+| price        | Float     | NOT NULL, CHECK (quantity > 0) | Saved product price                  |
 ```
 
 ### Denormalization notes

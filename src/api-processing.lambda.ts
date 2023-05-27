@@ -41,11 +41,11 @@ async function getOrders(email: string, orderDate: string): Promise<Order[]> {
     const result = await dynamoDb.query(params).promise();
     console.log('getOrders: Fetched orders', result);
 
-    const productIds = Array.from(new Set(result.Items.map((item: any) => item.productId))) as string[];
+    const productIds = Array.from(new Set(result.Items!.map((item: any) => item.productId))) as string[];
 
     const productsById = await getProductsByIds(productIds);
 
-    const ordersWithProductIds = result.Items.map((item: any) => ({
+    const ordersWithProductIds = result.Items!.map((item: any) => ({
       lineId: item.lineId,
       id: item.id,
       date: item.date,
@@ -54,6 +54,7 @@ async function getOrders(email: string, orderDate: string): Promise<Order[]> {
       productId: item.productId,
       totalAmount: item.totalAmount,
       quantity: item.quantity,
+      price: item.price, // use the price stored in Orders table
       product: productsById[item.productId],
     })) as Order[];
 
@@ -76,17 +77,18 @@ function groupOrdersById(ordersWithProductIds: Order[]): Order[] {
         ...order,
         products: [order.product!].map(p => ({
           name: p.name,
-          price: p.price,
+          price: order.price ?? p.price, // Use the order.price instead of p.price
           quantity: order.quantity ?? 0,
         })),
       };
       delete groupedOrders[order.id].product;
       delete groupedOrders[order.id].quantity;
       delete groupedOrders[order.id].productId;
+      delete groupedOrders[order.id].price; // Remove price from the root level object
     } else {
       groupedOrders[order.id].products?.push({
         name: order.product!.name,
-        price: order.product!.price,
+        price: order.price ?? order.product!.price, // Use the order.price instead of order.product.price
         quantity: order.quantity ?? 0,
       });
     }

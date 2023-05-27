@@ -9,8 +9,8 @@ export interface Order {
   quantity?: number; // Make 'quantity' field optional
   product?: Product;
   products?: { name: string; price: number; quantity: number }[];
+  price?: number; // Add 'price' field in Order type
 }
-
 
 export interface Product {
   id: string;
