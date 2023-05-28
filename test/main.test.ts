@@ -15,7 +15,7 @@ test('Snapshot', () => {
   );
   expect(populateLambda.length).toBeGreaterThan(0);
 
-  // Check that there is at least one DynamoDB table
+  // Check that there are 2 DynamoDB tables
   template.resourceCountIs('AWS::DynamoDB::Table', 2);
 
   // Check for an AppSync API
