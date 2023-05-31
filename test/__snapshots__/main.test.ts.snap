@@ -260,7 +260,7 @@ exports[`Snapshot 1`] = `
             "ApiId",
           ],
         },
-        "Expires": 1716733830,
+        "Expires": 1716781634,
       },
       "Type": "AWS::AppSync::ApiKey",
     },
@@ -337,7 +337,7 @@ type Query {
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "aa4e56c2ee399dca3d8a201b4c35b23fcc38b42ef75a9ac9397bc984233678e2.zip",
+          "S3Key": "399f51206fa541291a1107f1ed836994e8028a2d7ac48c6181919a1869f58226.zip",
         },
         "Description": "src/api-processing.lambda.ts",
         "Environment": {
